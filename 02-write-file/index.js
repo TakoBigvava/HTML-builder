@@ -13,7 +13,7 @@ rl.question('Enter your text \n', (userText)=>{
 rl.on('line', (newLine)=>{
   fs.appendFile(filePath, `${newLine}\n`,(err)=>{
     if(err){
-      console.log('Something Wrong');
+      console.log(err);
     }
     if(newLine.trim().toLowerCase() ==='exit'){
       rl.close();
