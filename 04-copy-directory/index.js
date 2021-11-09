@@ -13,11 +13,6 @@ async function copyFolder(dest, src) {
     const filePath = path.join(dest, path.basename(file));
     fs.unlink(filePath, (err)=>{if(err)throw err;}); 
   }
-  // fs.mkdir(dest, {recursive: true},(err)=>{
-  //   if(err){
-  //     return console.log(err);
-  //   }
-  // });
   const dir = await fs.promises.readdir(src);
   for await (const file of dir) { 
     const filePath = path.join(dest, path.basename(file));
