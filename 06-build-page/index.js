@@ -63,24 +63,43 @@ setTimeout(() => {
 
 async function copyDir(src, dest) {
   await fs.promises.mkdir(dest, { recursive: true });
-  let entries = await fs.promises.readdir(src, { withFileTypes: true });
+  let DestEntries = await fs.promises.readdir(dest, { withFileTypes: true });
+  // removing existing destination folders and files
+  for await (let entry of DestEntries) { 
+    let destPath = path.join(dest, entry.name);
 
+    if(entry.isDirectory()){
+      let files = await fs.promises.readdir(destPath, { withFileTypes: true });
+      for await (let file of files){
+          
+        const filePath = path.join(destPath, file.name);
+        fs.unlink(filePath, (err)=>{if(err)throw err;}); 
+      }
+    } else {
+      fs.unlink(destPath, (err)=>{if(err)throw err;}); 
+    } 
+  }
+  let entries = await fs.promises.readdir(src, { withFileTypes: true });
+  
   for (let entry of entries) {
     let srcPath = path.join(src, entry.name);
     let destPath = path.join(dest, entry.name);
 
-    entry.isDirectory() ?
-      await copyDir(srcPath, destPath) :
+    if(entry.isDirectory()){
+      await copyDir(srcPath, destPath);
+    } else {
       fs.copyFile(srcPath, destPath,(err)=>{
         if(err){
           return console.log(err);
         } 
       });
+    }
+
+     
   }
 }
 
 async function copyCss(src, destDirPath){
-    
   const dir = await fs.promises.readdir(src);
   const writeStream = fs.createWriteStream(path.join(destDirPath, 'style.css'), 'utf8');
   for await(const file of dir){
@@ -102,4 +121,4 @@ setTimeout(() => {
 
 setTimeout(() => {
   copyCss(srcCss, destDirPath);
-}, 1200);
+}, 200);
